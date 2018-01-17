@@ -1,0 +1,30 @@
+{
+  "name": "transfer",
+  "version": "1.0.0",
+  "description": "Transfer requests from public url to your localhost",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Javascipt/transfer.git"
+  },
+  "keywords": [
+    "tunnel",
+    "forward",
+    "http",
+    "server",
+    "request"
+  ],
+  "author": "Khalid Rehioui <Rehioui@gmail.com> (https://github.com/javascipt)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Javascipt/transfer/issues"
+  },
+  "homepage": "https://github.com/Javascipt/transfer#readme",
+  "dependencies": {
+    "request": "^2.83.0",
+    "socket.io-client": "^2.0.4"
+  }
+}
