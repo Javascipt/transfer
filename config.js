@@ -1,4 +1,5 @@
 module.exports = {
     protocol : 'http://',
-    hostname : 'www.transfer.pub'
+    hostname : 'transfer.pub',
+    socketUrl : 'http://transfer.pub'
 }

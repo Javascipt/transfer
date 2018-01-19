@@ -1,20 +1,19 @@
 var config          = require('./config');
 var request         = require('request');
-
 var socket;
 
 module.exports = {
     to : function (url) {
         return new Promise((resolve, reject) => {
-            socket = require('socket.io-client')(config.protocol + config.hostname);
-            socket.on('id', (id) => {
+            socket = require('socket.io-client')(config.socketUrl);
+            socket.on('token', (token) => {
                 resolve({
-                    id      : id,
-                    url     : config.protocol + id + '.' + config.hostname,
-                    pathUrl : config.protocol + 'path.' + config.hostname + '/' + id
+                    token   : token,
+                    url     : config.protocol + token + '.' + config.hostname,
+                    pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
                 });
             });
-            socket.emit('id');
+            socket.emit('token');
             
             socket.on('request', (data) => {
                 delete data.headers.host;
@@ -37,7 +36,3 @@ module.exports = {
         socket && socket.disconnect();
     }
 };
-
-
-module.exports.to('https://httpbin.org')
-    .then(console.log);
