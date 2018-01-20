@@ -1,9 +1,14 @@
 var config          = require('./config');
 var request         = require('request');
+var version         = require('./package.json').version;
 var socket;
 
 module.exports = {
-    to : function (url) {
+    version,
+    to : function (options) {
+        var port    = (typeof + options == 'number') ? options : 80;
+        var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
+
         return new Promise((resolve, reject) => {
             socket = require('socket.io-client')(config.socketUrl);
             socket.on('token', (token) => {
@@ -13,7 +18,7 @@ module.exports = {
                     pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
                 });
             });
-            socket.emit('token');
+            socket.emit('token', { version });
             
             socket.on('request', (data) => {
                 delete data.headers.host;
