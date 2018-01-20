@@ -19,10 +19,10 @@ transfer.to('http://localhost:8080')
 In order to stop listening for upcoming requests:
 
 ```javascript
-  transfer.to('http://localhost:8080')
+  transfer.to(8080) // Will transfer all requests to your port 8080
     .then(console.log);
   
   transfer.disconnect();
 ```
 
-Note that this is the very first iteration, the communications are done through http protocole and not https. This will change very soon.
+Note that this is the very first iteration, the communications are done through http protocole and not https. This will change very soon by supporting both protocols.
