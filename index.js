@@ -8,29 +8,50 @@ module.exports = {
     to : function (options) {
         var port    = (typeof + options == 'number') ? options : 80;
         var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
+        var timeout;
 
         return new Promise((resolve, reject) => {
             socket = require('socket.io-client')(config.socketUrl);
-            socket.on('token', (token) => {
+
+            //-- Define token handler --
+            var tokenHandler = (token) => {
+
+                //-- Clear timeout to avoid rejecting the promise after resolving --
+                clearTimeout(timeout);
+
+                //-- Resolve the promise
                 resolve({
                     token   : token,
                     url     : config.protocol + token + '.' + config.hostname,
                     pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
                 });
-            });
+            };
+
+            //-- Set timeout in case no response received from the server --
+            timeout = setTimeout(() => {
+
+                //-- Remove the listner to avoid receiving late reply --
+                socket.removeListener('token', tokenHandler);
+                reject();
+
+            }, config.timeout);
+
+            //-- Handle token receiving + request the token --
+            socket.on('token', tokenHandler);
             socket.emit('token', { version });
             
+
+            //-- Reproduce the request sent to the server --
             socket.on('request', (data) => {
                 delete data.headers.host;
-
                 request[data.method.toLowerCase()]({
                     url     : url + data.route,
                     body    : data.body.toString(),
                     headers : data.headers
-                }, function (err, response, body) {
+                }, function (err, response) {
                     socket.emit('response', {
                         status  : (response || { statusCode : 500 }).statusCode,
-                        body    : (response || {}).body,
+                        body    : (response || {}).body,
                         headers : (response || {}).headers
                     });
                 });
