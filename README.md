@@ -9,14 +9,14 @@ var transfer = require('transfer');
 transfer.to('http://localhost:8080')
   .then(result => {
     console.log(result); 
-    /* { id      : '2KFQNpM', 
+    /* { token   : '2KFQNpM', 
          url     : 'http://2KFQNpM.transfer.pub', 
          pathUrl : 'http://path.transfer.pub/2KFQNpM' } */
   });
 
 ```
 
-In order to stop listening for upcoming requests:
+In order to stop listening for upcoming requests you can use `transfer.disconnect`:
 
 ```javascript
   transfer.to(8080) // Will transfer all requests to your port 8080
