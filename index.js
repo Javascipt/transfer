@@ -1,64 +1,69 @@
 var config          = require('./config');
 var request         = require('request');
-var version         = require('./package.json').version;
-var socket;
 
-module.exports = {
-    version,
-    to : function (options) {
-        var port    = (typeof + options == 'number') ? options : 80;
-        var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
-        var timeout;
+var Transfer = function () {
+    this._version = require('./package.json').version;
+};
 
-        return new Promise((resolve, reject) => {
-            socket = require('socket.io-client')(config.socketUrl);
+Transfer.prototype.to = (options) => {
+    var port    = (typeof + options == 'number') ? options : 80;
+    var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
 
-            //-- Define token handler --
-            var tokenHandler = (token) => {
+    //-- Attempt to connect to Transfer.pub servers --
+    this._socket = require('socket.io-client')(config.socketUrl);
 
-                //-- Clear timeout to avoid rejecting the promise after resolving --
-                clearTimeout(timeout);
+    return new Promise((resolve, reject) => {
 
-                //-- Resolve the promise
-                resolve({
-                    token   : token,
-                    url     : config.protocol + token + '.' + config.hostname,
-                    pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
-                });
-            };
+        //-- Define token handler --
+        var tokenHandler = (token) => {
+            //-- Clear timeout to avoid rejecting the promise after resolving --
+            clearTimeout(this._timeout);
 
-            //-- Set timeout in case no response received from the server --
-            timeout = setTimeout(() => {
+            //-- Resolve the promise
+            resolve({
+                token   : token,
+                url     : config.protocol + token + '.' + config.hostname,
+                pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
+            });
+        };
 
-                //-- Remove the listner to avoid receiving late reply --
-                socket.removeListener('token', tokenHandler);
-                reject();
+        //-- Set timeout in case no response received from the server --
+        this._timeout = setTimeout(() => {
 
-            }, config.timeout);
+            //-- Remove the listner to avoid receiving late reply --
+            this._socket.removeListener('token', tokenHandler);
+            reject();
 
-            //-- Handle token receiving + request the token --
-            socket.on('token', tokenHandler);
-            socket.emit('token', { version });
-            
+        }, config.timeout);
 
-            //-- Reproduce the request sent to the server --
-            socket.on('request', (data) => {
-                delete data.headers.host;
-                request[data.method.toLowerCase()]({
-                    url     : url + data.route,
-                    body    : data.body.toString(),
-                    headers : data.headers
-                }, function (err, response) {
-                    socket.emit('response', {
-                        status  : (response || { statusCode : 500 }).statusCode,
-                        body    : (response || {}).body,
-                        headers : (response || {}).headers
-                    });
+        //-- Handle token receiving + request the token --
+        this._socket.on('token', tokenHandler);
+        this._socket.emit('token', { version : this._version });
+        
+        //-- Reproduce the request sent to the server --
+        this._socket.on('request', (data) => {
+            delete data.headers.host;
+            request[data.method.toLowerCase()]({
+                url     : url + data.route,
+                body    : data.body.toString(),
+                headers : data.headers
+            }, (err, response) => {
+                this._socket.emit('response', {
+                    status  : (response || { statusCode : 500 }).statusCode,
+                    body    : (response || {}).body,
+                    headers : (response || {}).headers
                 });
             });
         });
-    },
-    disconnect : function () {
-        socket && socket.disconnect();
-    }
+    });
 };
+
+Transfer.prototype.disconnect = () => {
+    //-- Disconnect only when already connected --
+    this._socket && this._socket.disconnect();
+};
+
+//-- Returning new instance of Transfer each time the module is required --
+Object.defineProperty(module, 'exports', {
+    get: () => new Transfer()
+});
