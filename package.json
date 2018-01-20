@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/Javascipt/transfer#readme",
   "dependencies": {
-    "request": "^2.83.0",
-    "socket.io-client": "^2.0.4"
+    "request": "~2.83.0",
+    "socket.io-client": "~2.0.4"
   }
 }
