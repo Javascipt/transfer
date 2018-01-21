@@ -5,7 +5,7 @@ var Transfer = function () {
     this._version = require('./package.json').version;
 };
 
-Transfer.prototype.to = (options) => {
+Transfer.prototype.to = function (options) {
     var port    = (typeof + options == 'number') ? options : 80;
     var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
 
@@ -13,11 +13,13 @@ Transfer.prototype.to = (options) => {
     this._socket = require('socket.io-client')(config.socketUrl);
 
     return new Promise((resolve, reject) => {
-
         //-- Define token handler --
         var tokenHandler = (token) => {
             //-- Clear timeout to avoid rejecting the promise after resolving --
             clearTimeout(this._timeout);
+
+            //-- Store the token --
+            this._token = token;
 
             //-- Resolve the promise
             resolve({
@@ -31,14 +33,19 @@ Transfer.prototype.to = (options) => {
         this._timeout = setTimeout(() => {
 
             //-- Remove the listner to avoid receiving late reply --
-            this._socket.removeListener('token', tokenHandler);
-            reject();
+            this._socket.off('token', tokenHandler);
+
+            //-- Disconnect from transfer.pub servers --
+            this._socket.disconnect();
+            reject('Connection timeout');
 
         }, config.timeout);
 
-        //-- Handle token receiving + request the token --
+        //-- Handle token receiving then request the token when ready --
         this._socket.on('token', tokenHandler);
-        this._socket.emit('token', { version : this._version });
+        this._socket.on('ready', () => {
+            this._socket.emit('token', { version : this._version });
+        });
         
         //-- Reproduce the request sent to the server --
         this._socket.on('request', (data) => {
@@ -58,7 +65,7 @@ Transfer.prototype.to = (options) => {
     });
 };
 
-Transfer.prototype.disconnect = () => {
+Transfer.prototype.disconnect = function () {
     //-- Disconnect only when already connected --
     this._socket && this._socket.disconnect();
 };

@@ -4,13 +4,14 @@
   "description": "Transfer requests from public url to your localhost",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nyc mocha --timeout=3000 && eslint ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Javascipt/transfer.git"
   },
   "keywords": [
+    "transfer",
     "tunnel",
     "forward",
     "http",
@@ -26,5 +27,10 @@
   "dependencies": {
     "request": "~2.83.0",
     "socket.io-client": "~2.0.4"
+  },
+  "devDependencies": {
+    "mock-require": "~3.0.1",
+    "mock-socket": "~7.1.0",
+    "nyc": "~11.4.1"
   }
 }
