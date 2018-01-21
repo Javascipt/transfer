@@ -1,5 +1,7 @@
 ### Transfer requests from public url to your localhost!
 
+![Transfer](https://api.travis-ci.org/Javascipt/transfer.svg)
+
 It's as simple as you may think:
 
 ```javascript
