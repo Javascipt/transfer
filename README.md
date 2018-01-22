@@ -17,6 +17,7 @@ transfer.to('http://localhost:8080')
   });
 
 ```
+Now all requests going to `http://2KFQNpM.transfer.pub` or `http://path.transfer.pub/2KFQNpM` are transferred to your localhost.
 
 In order to stop listening for upcoming requests you can use `transfer.disconnect`:
 
