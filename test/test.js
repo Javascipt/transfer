@@ -96,7 +96,65 @@ describe('Transfer.prototype.to - Token', () => {
 });
 
 describe('Transfer.prototype.to - Request reproduction', () => {
-    // Test different methods , headers , body ...
+    var nock    = require('nock');
+    var config  = require('../config');
+
+    //-- Mock socket.io-client --
+    mock('socket.io-client', require('mock-socket').SocketIO);
+
+    var result = {};
+    var scopes = {};
+
+    before((done) => {
+        mock('./config', Object.assign(config, { socketUrl : 'http://127.0.0.1:8080', timeout : 100 }));
+        var server      = new Server(config.socketUrl);
+        var transfer    = require('..');
+
+        server.on('connection', socket => {
+            
+            socket.on('response', data => {
+                result[data.body] = data;
+                if (Object.keys(result).length === 3) {
+                    done();
+                    server.stop();
+                }
+            });
+
+            socket.on('token', () => {
+                socket.emit('token', 'test');
+                socket.emit('request', { method : 'GET', route : '/test', body: '', headers : [] });
+                socket.emit('request', { method : 'POST', route : '/test', body: { id : '123ABC' }, headers : []  });
+                socket.emit('request', { method : 'PATCH', route : '/do-not-exist', body: { id : '123ABC' }, headers : []  });
+            });
+            socket.emit('ready');
+        });
+
+        scopes.get = nock('http://127.0.0.1:8080')
+            .get('/test')
+            .query(true)
+            .reply(200, 'get');
+
+        scopes.post = nock('http://127.0.0.1:8080')
+            .post('/test')
+            .query(true)
+            .reply(200, 'post');
+
+        transfer.to(8080);
+    });
+
+    it('Should return 200 for GET request', () => {
+        scopes.get.isDone();
+        assert.equal(result.get.status, 200);
+    });
+
+    it('Should return 200 for POST request', () => {
+        scopes.post.isDone();
+        assert.equal(result.post.status, 200);
+    });
+
+    it('Should return 500 for unsuccessful requests', () => {
+        assert.equal(result[undefined].status, 500);
+    });
 });
 
 describe('Transfer.prototype.disconnect', () => {
