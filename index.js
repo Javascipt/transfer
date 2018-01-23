@@ -6,8 +6,8 @@ var Transfer = function () {
 };
 
 Transfer.prototype.to = function (options) {
-    var port    = (typeof + options == 'number') ? options : 80;
-    var url     = (typeof + options == 'string') ? options : `http://127.0.0.1:${port}`;
+    var port    = isNaN(options) === false ? options : 80;
+    var url     = isNaN(options) === true  ? options : `http://127.0.0.1:${port}`;
 
     //-- Attempt to connect to Transfer.pub servers --
     this._socket = require('socket.io-client')(config.socketUrl);
