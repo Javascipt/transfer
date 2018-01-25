@@ -1,5 +1,5 @@
-var config          = require('./config');
-var request         = require('request');
+var config  = require('./config');
+var request = require('request');
 
 var Transfer = function () {
     this._version = require('./package.json').version;
@@ -53,7 +53,8 @@ Transfer.prototype.to = function (options) {
             request[data.method.toLowerCase()]({
                 url     : url + data.route,
                 body    : data.body.toString(),
-                headers : data.headers
+                headers : data.headers,
+                encoding: data.encoding
             }, (err, response) => {
                 this._socket.emit('response', {
                     status  : (response || { statusCode : 500 }).statusCode,
