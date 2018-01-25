@@ -56,7 +56,7 @@ Transfer.prototype.to = function (options) {
                 headers : data.headers,
                 encoding: data.encoding
             }, (err, response) => {
-                this._socket.emit('response', {
+                this._socket.emit('response-' + data.requestId, {
                     status  : (response || { statusCode : 500 }).statusCode,
                     body    : (response || {}).body,
                     headers : (response || {}).headers
