@@ -9,6 +9,9 @@ Transfer.prototype.to = function (options) {
     var port    = isNaN(options) === false ? options : 80;
     var url     = isNaN(options) === true  ? options : `http://127.0.0.1:${port}`;
 
+    //-- We disconnect the socket in case we already initiated a connection --
+    this.disconnect();
+
     //-- Attempt to connect to Transfer.pub servers --
     this._socket = require('socket.io-client')(config.socketUrl);
 

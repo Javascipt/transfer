@@ -112,7 +112,7 @@ describe('Transfer.prototype.to - Request reproduction', () => {
 
         server.on('connection', socket => {
             
-            socket.on('response', data => {
+            socket.on('response-reqid', data => {
                 result[data.body] = data;
                 if (Object.keys(result).length === 3) {
                     done();
@@ -122,9 +122,9 @@ describe('Transfer.prototype.to - Request reproduction', () => {
 
             socket.on('token', () => {
                 socket.emit('token', 'test');
-                socket.emit('request', { method : 'GET', route : '/test', body: '', headers : [] });
-                socket.emit('request', { method : 'POST', route : '/test', body: { id : '123ABC' }, headers : []  });
-                socket.emit('request', { method : 'PATCH', route : '/do-not-exist', body: { id : '123ABC' }, headers : []  });
+                socket.emit('request', { requestId : 'reqid', method : 'GET', route : '/test', body: '', headers : [] });
+                socket.emit('request', { requestId : 'reqid', method : 'POST', route : '/test', body: { id : '123ABC' }, headers : []  });
+                socket.emit('request', { requestId : 'reqid', method : 'PATCH', route : '/do-not-exist', body: { id : '123ABC' }, headers : []  });
             });
             socket.emit('ready');
         });
