@@ -11,13 +11,14 @@ var transfer = require('transfer');
 transfer.to('http://localhost:8080')
   .then(result => {
     console.log(result); 
-    /* { token   : '2KFQNpM', 
-         url     : 'http://2KFQNpM.transfer.pub', 
-         pathUrl : 'http://path.transfer.pub/2KFQNpM' } */
+    /* { token      : '2KFQNpM', 
+         url        : '2KFQNpM.transfer.pub', 
+         pathUrl    : 'path.transfer.pub/2KFQNpM',
+         protocols  : ['http', 'https'] } */
   });
 
 ```
-Now all requests going to `http://2KFQNpM.transfer.pub` or `http://path.transfer.pub/2KFQNpM` are transferred to your localhost.
+Now all requests going to `https://2KFQNpM.transfer.pub` or `https://path.transfer.pub/2KFQNpM` are transferred to your localhost.
 
 In order to stop listening for upcoming requests you can use `transfer.disconnect`:
 
@@ -27,5 +28,3 @@ In order to stop listening for upcoming requests you can use `transfer.disconnec
   
   transfer.disconnect();
 ```
-
-Note that this is the very first iteration, the communications are done through http protocole and not https. This will change very soon by supporting both protocols.
