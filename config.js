@@ -1,6 +1,5 @@
 module.exports = {
-    protocol : 'http://',
     hostname : 'transfer.pub',
-    socketUrl : 'http://transfer.pub',
+    socketUrl : 'https://transfer.pub',
     timeout : 5000
 };

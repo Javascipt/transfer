@@ -31,9 +31,10 @@ Transfer.prototype.to = function (options) {
 
             //-- Resolve the promise
             resolve({
-                token   : token,
-                url     : config.protocol + token + '.' + config.hostname,
-                pathUrl : config.protocol + 'path.' + config.hostname + '/' + token
+                token       : token,
+                url         : token + '.' + config.hostname,
+                pathUrl     : 'path.' + config.hostname + '/' + token,
+                protocols   : ['http', 'https']
             });
         };
 
