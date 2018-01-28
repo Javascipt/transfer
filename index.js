@@ -1,5 +1,6 @@
 var config  = require('./config');
 var request = require('request');
+var uuid    = require('uuid/v4');
 
 var Transfer = function () {
     this._version = require('./package.json').version;
@@ -14,6 +15,10 @@ Transfer.prototype.to = function (options) {
 
     //-- Attempt to connect to Transfer.pub servers --
     this._socket = require('socket.io-client')(config.socketUrl);
+
+    //-- Client id, used to maintain same token in case of network issues --
+    //-- When disconnecting and connecting again. --
+    this._clientId = uuid();
 
     return new Promise((resolve, reject) => {
         //-- Define token handler --
@@ -47,7 +52,11 @@ Transfer.prototype.to = function (options) {
         //-- Handle token receiving then request the token when ready --
         this._socket.on('token', tokenHandler);
         this._socket.on('ready', () => {
-            this._socket.emit('token', { version : this._version });
+            this._socket.emit('token', { 
+                version     : this._version,
+                clientId    : this._clientId,
+                token       : this._token
+            });
         });
         
         //-- Reproduce the request sent to the server --
