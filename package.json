@@ -1,6 +1,6 @@
 {
   "name": "transfer",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Transfer requests from public url to your localhost",
   "main": "index.js",
   "scripts": {
